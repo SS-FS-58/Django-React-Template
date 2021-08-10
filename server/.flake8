@@ -1,0 +1,21 @@
+[flake8]
+max-line-length=120
+max-complexity=10
+multiline-quotes="""
+docstring-quotes="""
+exclude =
+    .git,
+    __pycache__,
+    src,
+    bin,
+    build,
+    dist,
+    lib,
+    migrations,
+    docs,
+    venv,
+    .venv,
+    .env
+    whaleserver/api/tests/
+    whaleserver/normalization/tests/
+    tool/

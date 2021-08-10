@@ -1,0 +1,5 @@
+# service worker for PWA
+src/serviceWorker.js
+
+# test configuration
+setupTests.js

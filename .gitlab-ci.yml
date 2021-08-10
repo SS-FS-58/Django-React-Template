@@ -1,0 +1,59 @@
+image: docker:19.03.12
+
+stages:
+  - code_quality
+  # - vault
+  # - build
+  # - test
+  - deploy
+
+default:
+  before_script:
+    - docker info
+    - apk update
+    - apk add --no-cache docker-compose git
+    - docker-compose --version
+    - git --version
+
+backend_code_quality:
+  image: python:3.6
+  before_script:
+    - pip install --upgrade pip setuptools
+    - pip install flake8
+  stage: code_quality
+  script:
+    - cd $CI_PROJECT_DIR/server/
+    - flake8
+
+#ui_code_quality:
+#  image: node:lts
+#  before_script:
+#    - npm version
+#  stage: code_quality
+#  script:
+#    - cd $CI_PROJECT_DIR/client/
+#    - npm install
+#    - npm run lint
+
+deploy_dev:
+  stage: deploy
+  environment: development
+  tags:
+    - deploy
+    - shell
+    - development
+  only:
+    - development
+  script:
+    - cat $DEV_BACKEND_CONFIG >> .env
+    - mv .env $CI_PROJECT_DIR/docker/server/.env
+    - cat $DEV_UI_CONFIG >> .env
+    - mv .env $CI_PROJECT_DIR/docker/client/.env
+    - docker-compose down --remove-orphans
+    - docker system prune --all --force
+    - docker volume ls -f dangling=true
+    - docker volume prune --force
+    - docker-compose build
+    - docker-compose up -d --force-recreate
+    - docker ps -a
+
